@@ -21,7 +21,7 @@ To initialize or reset your environment, run:
 script/setup
 ````
 
-**This command may destroy configuration and data**
+**This command may destroy configuration and data.**
 
 ## Running the server
 
@@ -33,6 +33,6 @@ script/server
 
 ## Accessing the application
 
-Navigate to http://localhost:3000
+Navigate to [http://localhost:3000](http://localhost:3000)
 
 You will be prompted to login, contact kclough@jarv.us for credentials. Once logged in, you should see client data.
