@@ -23,11 +23,6 @@ app.keys = [process.env.KOA_SESSION_KEY || 'KOA_SESSION_KEY should be set'];
 app.use(require('koa-session')(app));
 
 
-// setup cookie parser
-// TODO: is this AND koa-session needed?
-app.use(require('koa-cookie').default());
-
-
 // setup authentication enforcement
 const unauthenticatedRoutes = [
     '/login',
@@ -42,8 +37,10 @@ app.use((ctx, next) => {
             return;
         } else {
             // TODO: validate authentication
-            if (ctx.cookie && ctx.cookie.okta_token) {
-                ctx.session.token = ctx.cookie.okta_token;
+            const oktaToken = ctx.cookies.get('okta_token');
+
+            if (oktaToken) {
+                ctx.session.token = oktaToken;
             }
         }
     }
