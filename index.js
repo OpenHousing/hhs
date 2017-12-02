@@ -11,7 +11,7 @@ const session = require('koa-session');
 const fs = require('fs');
 
 const app = new Koa();
-app.keys = ['secret', 'key'];
+app.keys = [process.env.KOA_SESSION_KEY || 'KOA_SESSION_KEY should be set'];
 
 const unauthenticatedRoutes = [
     '/login',
@@ -59,7 +59,7 @@ app.use(serve(
 ));
 
 
-compressor.minify({ 
+compressor.minify({
     compressor: 'no-compress',
     publicFolder: './src/js/',
     input: [

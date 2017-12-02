@@ -10,5 +10,8 @@ script/bootstrap
 echo "==> Initializing .env…"
 cp -v sample.env .env
 
+echo "==> Generating KOA_SESSION_KEY…"
+echo "KOA_SESSION_KEY='$(cat /dev/urandom | env LC_CTYPE=C tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)'" >> .env
+
 echo "==> Loading static demo data…"
 cp -v static/client-enrollments-dev.json static/client-enrollments.json
