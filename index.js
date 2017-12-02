@@ -5,6 +5,11 @@
 require('dotenv').config();
 
 
+// initialize top-level configuration
+const port = process.env.PORT || 3000;
+const baseUrl = `http://localhost:${port}`;
+
+
 // initialize Koa server
 const app = new (require('koa'))();
 
@@ -49,12 +54,33 @@ app.use((ctx, next) => {
 });
 
 
+// setup view renderer
+const hbs = require('koa-hbs');
+
+app.use(hbs.middleware({
+    viewPath: __dirname + '/views'
+}));
+
+hbs.registerHelper('json', data => {
+    return new hbs.SafeString(JSON.stringify(data));
+});
+
+
 // setup router
 const router = require('koa-router')();
 app.use(router.routes());
 
 
 // setup authentication routes
+router.get('/login', async ctx => {
+    await ctx.render('login', {
+        baseUrl,
+        loginUrl: `${baseUrl}/login`,
+        oktaUrl: process.env.OKTA_URL,
+        oktaClientId: process.env.OKTA_CLIENT_ID
+    });
+});
+
 router.get('/logout', ctx => {
     ctx.session = {};
     // TODO: erase session
@@ -87,8 +113,6 @@ require('node-minify').minify({
     ],
     output: './static/js/main.js'
 }).then(() => {
-    const port = process.env.PORT || 3000;
-
-    console.log(`> Ready on http://localhost:${port}`);
+    console.log(`> Ready on ${baseUrl}`);
     app.listen(port);
 });

@@ -9,26 +9,25 @@
     <body>
         <script type="text/javascript">
             $(document).ready(function() {
-                // TODO migrate okta tokens to .env config
                 var authClient = new OktaAuth({
-                    url: 'https://dev-877690.oktapreview.com',
-                    clientId: '0oacetxok6YNOuZA70h7',
-                    redirectUri: 'http://localhost:3000/login'
+                    url: {{json oktaUrl}},
+                    clientId: {{json oktaClientId}},
+                    redirectUri: {{json loginUrl}}
                 });
-                
+
                 authClient.token.parseFromUrl()
                     .then(function(token) {
                         return Promise.resolve(authClient.token.verify(token));
                     })
                     .then(function(token) {
                         document.cookie = 'okta_token='+token.idToken;
-                        window.location.href = 'http://localhost:3000/'
+                        window.location.href = {{json baseUrl}}
                     })
                     .catch(function(err) {
                         // invalid / no token set
                         setTimeout(authClient.token.getWithRedirect, 3000);
                     });
-            });    
+            });
         </script>
     </body>
 </html>
