@@ -15,3 +15,6 @@ echo "KOA_SESSION_KEY='$(cat /dev/urandom | env LC_CTYPE=C tr -dc 'a-zA-Z0-9' | 
 
 echo "==> Loading static demo data…"
 cp -v static/client-enrollments-dev.json static/client-enrollments.json
+
+echo "==> Finished. Next steps:"
+echo "- Update .env with HMIS and CJ credentials if available"
