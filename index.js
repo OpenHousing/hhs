@@ -90,7 +90,8 @@ require('node-minify').minify({
     ],
     output: './static/js/main.js'
 }).then(() => {
-    // TODO: pull port # from .env
-    console.log(`> Ready on http://localhost:3000`);
-    app.listen(3000);
+    const port = process.env.PORT || 3000;
+
+    console.log(`> Ready on http://localhost:${port}`);
+    app.listen(port);
 });
