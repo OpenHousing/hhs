@@ -1,53 +1,72 @@
 'use strict';
 
 
-const Koa = require('koa');
-const serve = require('koa-static');
-const router = require('koa-router')();
-const compressor = require('node-minify');
-const cookie = require('koa-cookie');
-const session = require('koa-session');
+// load config from .env into process.env
+require('dotenv').config();
 
-const fs = require('fs');
 
-const app = new Koa();
+// initialize Koa server
+const app = new (require('koa'))();
+
+
+// setup verbose logging
+if (process.env.VERBOSE === 'true') {
+    app.use((ctx, next) => {
+        console.log(`${ctx.method} ${ctx.path}`);
+        return next();
+    });
+}
+
+
+// setup session
 app.keys = [process.env.KOA_SESSION_KEY || 'KOA_SESSION_KEY should be set'];
+app.use(require('koa-session')(app));
 
+
+// setup cookie parser
+// TODO: is this AND koa-session needed?
+app.use(require('koa-cookie').default());
+
+
+// setup authentication enforcement
 const unauthenticatedRoutes = [
     '/login',
     '/logout'
 ];
 
-app.use(cookie.default());
-app.use(session(app));
+app.use((ctx, next) => {
+    // redirect to login page / store auth token
+    if (ctx.session.isNew || !ctx.session.token) {
+        if (unauthenticatedRoutes.indexOf(ctx.path) === -1) {
+            ctx.redirect('/login');
+            return;
+        } else {
+            // TODO: validate authentication
+            if (ctx.cookie && ctx.cookie.okta_token) {
+                ctx.session.token = ctx.cookie.okta_token;
+            }
+        }
+    }
 
-router.get('/logout', function (ctx, next) {
+    return next();
+});
+
+
+// setup router
+const router = require('koa-router')();
+app.use(router.routes());
+
+
+// setup authentication routes
+router.get('/logout', ctx => {
     ctx.session = {};
+    // TODO: erase session
     ctx.redirect('/login');
 });
 
-app.use(router.routes());
 
-app.use(async (ctx, next) => {
-    return next().then(() => {
-        console.log(`${ctx.method} ${ctx.path}`);
-
-        // redirect to login page / store auth token
-        if (ctx.session.isNew || !ctx.session.token) {
-            if (unauthenticatedRoutes.indexOf(ctx.path) === -1) {
-                ctx.redirect('/login');
-                return;
-            } else {
-                if (ctx.cookie && ctx.cookie.okta_token) {
-                    ctx.session.token = ctx.cookie.okta_token;
-                }
-            }
-        }
-    });
-});
-
-
-app.use(serve(
+// setup static asset serving
+app.use(require('koa-static')(
     'static',
     {
         index: 'dashboard.html',
@@ -59,7 +78,8 @@ app.use(serve(
 ));
 
 
-compressor.minify({
+// compress assets and start server
+require('node-minify').minify({
     compressor: 'no-compress',
     publicFolder: './src/js/',
     input: [
@@ -70,7 +90,7 @@ compressor.minify({
     ],
     output: './static/js/main.js'
 }).then(() => {
-    //TODO pull port # from .env -- KBC
+    // TODO: pull port # from .env
     console.log(`> Ready on http://localhost:3000`);
     app.listen(3000);
 });
