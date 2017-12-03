@@ -7,10 +7,12 @@ module.exports = ({
     failureRedirect = '/'
 }) => {
 
-    // Handle auth check
-    app.unauthenticatedRoutes.push(path);
+    // Handle user check
+    const userUrl = `${path}/user`;
 
-    router.get(path, ctx => {
+    app.unauthenticatedRoutes.push(userUrl);
+
+    router.get(userUrl, ctx => {
         ctx.body = {
             success: true,
             user: ctx.state.user || null

@@ -6,7 +6,7 @@ GET {{host}}/
 
 
 ### Check auth status
-GET {{host}}/auth
+GET {{host}}/auth/user
 
 
 
