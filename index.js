@@ -22,6 +22,29 @@ if (process.env.VERBOSE === 'true') {
     });
 }
 
+// setup error handling
+app.use(async (ctx, next) => {
+    try {
+        await next();
+    } catch (err) {
+        ctx.status = err.status || 500;
+
+        if (err.errors) {
+            ctx.body = {
+                code: ctx.status,
+                message: err.errors
+            };
+        } else {
+            ctx.body = {
+                code: ctx.status,
+                message: typeof err == 'string' ? err : err.message
+            };
+        }
+
+        ctx.app.emit('error', err, ctx);
+    }
+});
+
 
 // setup session
 app.keys = [process.env.KOA_SESSION_KEY || 'KOA_SESSION_KEY should be set'];
