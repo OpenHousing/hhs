@@ -35,10 +35,9 @@ script/server
 
 Navigate to [http://localhost:3000](http://localhost:3000)
 
-You will be prompted to login, contact kclough@jarv.us for credentials. Once logged in, you should see client data.
+You will be prompted to login, contact kclough@jarv.us for credentials or set up new Okta authentication. Once logged in, you should see client data.
 
 ## Setting up Okta authentication
-
 
 1. Sign up as a developer at [https://developer.okta.com/signup/](https://developer.okta.com/signup/)
 1. Set `OKTA_URL` in `.env` to the base URL for your okta site
