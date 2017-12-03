@@ -14,8 +14,8 @@
 	<body>
 		<header class="container-fluid">
 			<div class="pull-right login">
-				<span>Hello, name</span>
-				<button class="btn btn-sm btn-default">Log out</button>
+				<span>Hello, {{user.displayName}}</span>
+				<a href="/auth/logout" class="btn btn-sm btn-default">Log out</a>
 			</div>
 			<h1>Client Tracking Tool</h1>
 		</header>

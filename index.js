@@ -5,13 +5,13 @@
 require('dotenv').config();
 
 
-// initialize top-level configuration
-const port = process.env.PORT || 3000;
-const baseUrl = `http://localhost:${port}`;
-
-
 // initialize Koa server
 const app = new (require('koa'))();
+
+
+// initialize top-level configuration
+const port = process.env.PORT || 3000;
+app.baseUrl = `http://localhost:${port}`;
 
 
 // setup verbose logging
@@ -28,29 +28,29 @@ app.keys = [process.env.KOA_SESSION_KEY || 'KOA_SESSION_KEY should be set'];
 app.use(require('koa-session')(app));
 
 
+// setup passport
+app.passport = require('./passport/okta')({ app });
+
+
 // setup authentication enforcement
-const unauthenticatedRoutes = [
-    '/login',
-    '/logout'
-];
+app.unauthenticatedRoutes = [];
 
-app.use((ctx, next) => {
-    // redirect to login page / store auth token
-    if (ctx.session.isNew || !ctx.session.token) {
-        if (unauthenticatedRoutes.indexOf(ctx.path) === -1) {
-            ctx.redirect('/login');
-            return;
+app.use(async (ctx, next) => {
+    if (
+        app.unauthenticatedRoutes.indexOf(ctx.path) === -1 && // whitelisted routes don't need auth
+        ctx.isUnauthenticated()
+    ) {
+        if (ctx.path == '/') {
+            ctx.redirect('/auth/login');
         } else {
-            // TODO: validate authentication
-            const oktaToken = ctx.cookies.get('okta_token');
-
-            if (oktaToken) {
-                ctx.session.token = oktaToken;
-            }
+            ctx.throw(401, {
+                success: false,
+                message: 'You must login first'
+            });
         }
+    } else {
+        return await next();
     }
-
-    return next();
 });
 
 
@@ -71,20 +71,12 @@ const router = require('koa-router')();
 app.use(router.routes());
 
 
-// setup authentication routes
-router.get('/login', async ctx => {
-    await ctx.render('login', {
-        baseUrl,
-        loginUrl: `${baseUrl}/login`,
-        oktaUrl: process.env.OKTA_URL,
-        oktaClientId: process.env.OKTA_CLIENT_ID
-    });
-});
-
-router.get('/logout', ctx => {
-    ctx.session = {};
-    // TODO: erase session
-    ctx.redirect('/login');
+// load route bundles
+[
+    './routes/auth',
+    './routes/dashboard'
+].forEach(routeBundle => {
+    require(routeBundle)({app, router});
 });
 
 
@@ -92,7 +84,6 @@ router.get('/logout', ctx => {
 app.use(require('koa-static')(
     'static',
     {
-        index: 'dashboard.html',
         extensions: [
             'json',
             'html'
@@ -113,6 +104,6 @@ require('node-minify').minify({
     ],
     output: './static/js/main.js'
 }).then(() => {
-    console.log(`> Ready on ${baseUrl}`);
+    console.log(`> Ready on ${app.baseUrl}`);
     app.listen(port);
 });

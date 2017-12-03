@@ -6,8 +6,8 @@ GET {{host}}/
 
 
 ### Get login page
-GET {{host}}/login
+GET {{host}}/auth/login
 
 
 ### Logout
-GET {{host}}/logout
+GET {{host}}/auth/logout
