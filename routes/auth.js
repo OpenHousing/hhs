@@ -8,10 +8,12 @@ module.exports = ({
 }) => {
 
     // Handle auth check
+    app.unauthenticatedRoutes.push(path);
+
     router.get(path, ctx => {
         ctx.body = {
             success: true,
-            user: ctx.state.user
+            user: ctx.state.user || null
         };
     });
 

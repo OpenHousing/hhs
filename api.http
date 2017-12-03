@@ -5,6 +5,11 @@
 GET {{host}}/
 
 
+### Check auth status
+GET {{host}}/auth
+
+
+
 ### Get login page
 GET {{host}}/auth/login
 
