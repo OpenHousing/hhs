@@ -23,6 +23,12 @@ script/setup
 
 **This command may destroy configuration and data.**
 
+## Data Generation
+
+This project pulls data from multiple data sources, and due to the complxity of API dependencies it must load that data in advance. In order to facilitate demonstrations, we have bundled generated data. To use that data source simply copy `static\client-enrollments-dev.json` to `static\client-enrollments.json` . ```cp static/client-enrollments-dev.json static/client-enrollments.json```
+
+For production deployments, run `node generate-clients`, this may take awhile. This should be configured to run as a nightly job.
+
 ## Running the server
 
 To start the web server, run:
@@ -40,7 +46,7 @@ You will be prompted to login, contact kclough@jarv.us for credentials or set up
 ## Setting up Okta authentication
 
 1. Sign up as a developer at [https://developer.okta.com/signup/](https://developer.okta.com/signup/)
-1. Set `OKTA_URL` in `.env` to the base URL for your okta site
+1. Set `OKTA_AUDIENCE` in `.env` to the base URL for your okta site
 1. Open the **Applications**→**Add Application** page from the Developer Console
 1. Choose **Web** as the platform
 1. Enter a **Name** like `OpenHousing HHS`
