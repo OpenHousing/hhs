@@ -195,7 +195,7 @@ $.fn.dataTable.ext.type.order['integer-desc'] = function(a, b) {
     }
 }
 
-var dateColumnIndex = 8;
+var dateColumnIndex = 9;
 // date range filtering
 $.fn.dataTableExt.afnFiltering.push(
     function( oSettings, aData, iDataIndex ) {
