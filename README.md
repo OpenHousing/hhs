@@ -1,28 +1,51 @@
-### Setup
+# OpenHousing/hhs
 
-Requires node 8.x.
+## Requirements
 
-Install dependencies:
+- node 8.x.
 
-```
-npm install
-```
+## Scripts to Rule Them All
 
-Copy `sample.env` to `.env` and customize
+This project follows the [Scripts to Rule Them All](https://githubengineering.com/scripts-to-rule-them-all/) pattern:
+
+- `script/bootstrap` - installs/updates all dependencies
+- `script/setup` - sets up a project to be used for the first time
+- `script/update` - updates a project to run at its current version
+- `script/server` - starts app
+
+## Getting started
+
+To initialize or reset your environment, run:
+
 ```bash
-cp sample.env .env
+script/setup
+````
+
+**This command may destroy configuration and data.**
+
+## Running the server
+
+To start the web server, run:
+
+```bash
+script/server
 ```
 
-run `node generate-clients` for data loaded from HMISLynk, this may take awhile.
+## Accessing the application
 
-Alternatively, load use `cp static/client-enrollments-dev.json static/client-enrollments.json` to use the predefined static data for demo purposes.
+Navigate to [http://localhost:3000](http://localhost:3000)
 
-Run:
+You will be prompted to login, contact kclough@jarv.us for credentials or set up new Okta authentication. Once logged in, you should see client data.
 
-```
-node index.js
-```
+## Setting up Okta authentication
 
-Navigate to http://localhost:3000
+1. Sign up as a developer at [https://developer.okta.com/signup/](https://developer.okta.com/signup/)
+1. Set `OKTA_URL` in `.env` to the base URL for your okta site
+1. Open the **Applications**→**Add Application** page from the Developer Console
+1. Choose **Web** as the platform
+1. Enter a **Name** like `OpenHousing HHS`
+1. Enter a **Base URI** like `http://localhost:3000/`
+1. Enter a **Login redirectURI** like `http://localhost:3000/auth/okta/callback`
+1. Set `OKTA_CLIENTID` and `OKTA_CLIENTSECRET` in `.env`
 
-You will be prompted to login, contact kclough@jarv.us for credentials. Once logged in, you should see client data. 
+See also [Okta Javascript SDK](https://developer.okta.com/code/javascript/)

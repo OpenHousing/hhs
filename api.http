@@ -1,0 +1,18 @@
+@host = http://localhost:3000
+
+
+### Get default route
+GET {{host}}/
+
+
+### Check auth status
+GET {{host}}/auth/user
+
+
+
+### Get login page
+GET {{host}}/auth/login
+
+
+### Logout
+GET {{host}}/auth/logout

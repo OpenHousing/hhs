@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# exit if any command fails and start from main project directory
+set -e
+cd "$(dirname "$0")/.."
+
+# ensure environment is up-to-date
+script/update
+
+echo "==> Launching index.js…"
+node index.js

@@ -1,56 +1,112 @@
 'use strict';
 
 
-const Koa = require('koa');
-const serve = require('koa-static');
-const router = require('koa-router')();
-const compressor = require('node-minify');
-const cookie = require('koa-cookie');
-const session = require('koa-session');
+// load config from .env into process.env
+require('dotenv').config();
 
-const fs = require('fs');
 
-const app = new Koa();
-app.keys = ['secret', 'key'];
+// initialize Koa server
+const app = new (require('koa'))();
 
-const unauthenticatedRoutes = [
-    '/login',
-    '/logout'
-];
 
-app.use(cookie.default());
-app.use(session(app));
+// initialize top-level configuration
+const port = process.env.PORT || 3000;
+app.baseUrl = `http://localhost:${port}`;
 
-router.get('/logout', function (ctx, next) {
-    ctx.session = {};
-    ctx.redirect('/login');
+
+// setup verbose logging
+if (process.env.VERBOSE === 'true') {
+    app.use((ctx, next) => {
+        console.log(`${ctx.method} ${ctx.path}`);
+        return next();
+    });
+}
+
+// setup error handling
+app.use(async (ctx, next) => {
+    try {
+        await next();
+    } catch (err) {
+        ctx.status = err.status || 500;
+
+        if (err.errors) {
+            ctx.body = {
+                code: ctx.status,
+                message: err.errors
+            };
+        } else {
+            ctx.body = {
+                code: ctx.status,
+                message: typeof err == 'string' ? err : err.message
+            };
+        }
+
+        ctx.app.emit('error', err, ctx);
+    }
 });
 
-app.use(router.routes());
+
+// setup session
+app.keys = [process.env.KOA_SESSION_KEY || 'KOA_SESSION_KEY should be set'];
+app.use(require('koa-session')(app));
+
+
+// setup passport
+app.passport = require('./passport/okta')({ app });
+
+
+// setup authentication enforcement
+app.unauthenticatedRoutes = [];
 
 app.use(async (ctx, next) => {
-    return next().then(() => {
-        console.log(`${ctx.method} ${ctx.path}`);
-
-        // redirect to login page / store auth token
-        if (ctx.session.isNew || !ctx.session.token) {
-            if (unauthenticatedRoutes.indexOf(ctx.path) === -1) {
-                ctx.redirect('/login');
-                return;
-            } else {
-                if (ctx.cookie && ctx.cookie.okta_token) {
-                    ctx.session.token = ctx.cookie.okta_token;
-                }
-            }
+    if (
+        app.unauthenticatedRoutes.indexOf(ctx.path) === -1 && // whitelisted routes don't need auth
+        ctx.isUnauthenticated()
+    ) {
+        if (ctx.path == '/') {
+            ctx.redirect('/auth/login');
+        } else {
+            ctx.throw(401, {
+                success: false,
+                message: 'You must login first'
+            });
         }
-    });
+    } else {
+        return await next();
+    }
 });
 
 
-app.use(serve(
+// setup view renderer
+const hbs = require('koa-hbs');
+
+app.use(hbs.middleware({
+    viewPath: __dirname + '/views'
+}));
+
+hbs.registerHelper('json', data => {
+    return new hbs.SafeString(JSON.stringify(data));
+});
+
+
+// setup router
+const router = require('koa-router')();
+app.use(router.routes());
+
+
+// load route bundles
+[
+    './routes/auth',
+    './routes/dashboard'
+].forEach(routeBundle => {
+    require(routeBundle)({app, router});
+});
+
+
+// setup static asset serving
+app.use(require('koa-static')(
     'static',
     {
-        index: 'dashboard.html',
         extensions: [
             'json',
             'html'
@@ -59,7 +115,8 @@ app.use(serve(
 ));
 
 
-compressor.minify({ 
+// compress assets and start server
+require('node-minify').minify({
     compressor: 'no-compress',
     publicFolder: './src/js/',
     input: [
@@ -70,7 +127,6 @@ compressor.minify({
     ],
     output: './static/js/main.js'
 }).then(() => {
-    //TODO pull port # from .env -- KBC
-    console.log(`> Ready on http://localhost:3000`);
-    app.listen(3000);
+    console.log(`> Ready on ${app.baseUrl}`);
+    app.listen(port);
 });
