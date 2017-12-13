@@ -125,9 +125,7 @@ var dateRenderer = function(data, type, full, meta) {
     return data;
 }
 
-var clientsDataTable = $('#clients').one('draw.dt', function() {
-    $('[data-toggle="tooltip"]').tooltip();
-});
+var clientsDataTable = $('#clients');
 
 $('.input-daterange').keyup(function() {
     clientsDataTable.DataTable().draw();
@@ -229,6 +227,9 @@ $.fn.dataTableExt.afnFiltering.push(
 );
 
 clientsDataTable.DataTable({
+    "fnDrawCallback": function() {
+        $('[data-toggle="tooltip"]').tooltip();
+    },
     autoWidth: false,
     paging: false,
     ajax: {
