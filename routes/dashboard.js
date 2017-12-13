@@ -5,8 +5,8 @@ module.exports = ({
     router // router instance
 }) => {
     // Handle dashboard
-    router.get('/', ctx => {
-        ctx.render('dashboard', {
+    router.get('/', async function (ctx) {
+        await ctx.render('dashboard', {
             user: ctx.state.user,
             config: {
                 UTILIZATION_TYPE_JAIL: {
