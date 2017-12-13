@@ -97,18 +97,38 @@ $(document).ready(function() {
     }
 
     var typeGauge = function(data, type, full, meta) {
-        if (data >= 1 && data <= 3) {
-            var diff = (3 - data),
+        var value = 0;
+        var columnConfig = meta.settings.aoColumns[meta.col];
+        var config;
+
+        if(columnConfig.name === 'user_type_cj') {
+            config = window.CTT_CONFIG.UTILIZATION_TYPE_JAIL;
+        }
+        else if(columnConfig.name === 'user_type_hmis') {
+            config = window.CTT_CONFIG.UTILIZATION_TYPE_HMIS;
+        }
+
+        if(data >= config.HIGH) {
+            value = 3;
+        }
+        else if(data >= config.MEDIUM_HIGH) {
+            value = 2;
+        }
+        else if(data >= config.MEDIUM) {
+            value = 1;
+        }
+        if (value >= 1 && value <= 3) {
+            var diff = (3 - value),
             string = '';
 
-            for (var i=0; i<data; i++) {
+            for (var i=0; i<value; i++) {
                 string += '<span class="type-gauge-pip-filled"></span>';
             }
             for (var i=0; i<diff; i++) {
                 string += '<span class="type-gauge-pip-empty"></span>';
             }
 
-            return '<span class="type-gauge" data-toggle="tooltip" title="' + enums['userType'][data] + '">' + string + '</span><span class="sr-only">' + data + '</span>';
+            return '<span class="type-gauge" data-toggle="tooltip" title="' + enums['userType'][value] + '">' + string + '</span><span class="sr-only">' + value + '</span>';
         }
 
         else {
