@@ -140,7 +140,7 @@ const getClients = async() => {
                         return e.householdid.length > 0
                     }).length;
 
-                    client.disablingConditionCount = disablingConditionCount;
+                    client.disabling_condition = disablingConditionCount > 0;
                     client.homelessHousingStatusCount = homelessHousingStatusCount;
                     client.family_status = familyStatusCount > 0;
                     client.history_unsheltered = homelessHousingStatusCount > 0;
