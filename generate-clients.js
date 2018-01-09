@@ -33,6 +33,8 @@ const cjAPICredentails = {
     password: process.env.CJ_API_PASSWORD,
 };
 
+const cocID = process.env.COC_ID;
+
 // 3.8 Disabling Condition
 // 0   No
 // 1   Yes
@@ -145,7 +147,52 @@ const getClients = async() => {
                     client.family_status = familyStatusCount > 0;
                     client.history_unsheltered = homelessHousingStatusCount > 0;
 
-                    // client.enrollments = enrollments; // useful for testing but not needed for front-end
+                    // Disable CocID check for now since all hmislynk data has this id.
+                    client.cocMatch = true;
+
+                    /*
+                    for(var j = 0; j < enrollments.length; j++) {
+                        const enrollment = enrollments[j];
+                        const enrollmentCocsUrl = `${hmislynkApiUrl}/clients/${client.clientId}/enrollments/${enrollment.enrollmentId}/enrollmentcocs`;
+                        const enrollmentCocsRequestOptions = {
+                            url: enrollmentCocsUrl,
+                            qs: {
+                                maxItems: 100000
+                            },
+                            headers: authHeaders,
+                            json: true
+                        };
+                        const enrollmentCocsResponse = await request(enrollmentCocsRequestOptions);
+
+                        if(enrollmentCocsResponse.enrollmentCocs &&
+                            enrollmentCocsResponse.enrollmentCocs.enrollmentCocs &&
+                            enrollmentCocsResponse.enrollmentCocs.enrollmentCocs.length > 0) {
+                                const enrollmentCocs = enrollmentCocsResponse.enrollmentCocs.enrollmentCocs;
+                                client.cocMatch = false;
+
+                                for(var k=0; k < enrollmentCocs.length; k++) {
+                                    const enrollmentCoc = enrollmentCocs[k]; 
+                                    // console.log('enrollmentCoc', enrollmentCoc);
+                                    console.log('cocCode', enrollmentCoc.cocCode);
+                                    // debugger
+
+                                    if(cocID == enrollmentCoc.cocCode) {
+                                        console.log('hit');
+                                        client.cocMatch = true;
+                                        // debugger
+                                    }
+                                }
+
+                                // enrollments[j].cocIds = enrollmentCocs.map(x => x.cocCode.trim()).reduce((x, y) => x.includes(y) ? x : [...x, y], []);
+                            }
+                    }
+                    */
+
+                    // client.enrollments = enrollments;
+                }
+
+                if(!client.cocMatch) {
+                    continue;
                 }
 
                 const crosswalkRecord = crosswalkData.find((x) => x.confidence > cjAPIConfig.minConfidence && x.source_system_id === client.sourceSystemId);
@@ -212,11 +259,16 @@ const getClients = async() => {
                 debugger
             }
 
-            results.push(client);
+            if(client.cocMatch) {
+                results.push(client);
+            }
         }
         
         const file = './static/client-enrollments.json';
+        
         jsonfile.writeFileSync(file, results);
+
+        console.log(`Wrote ${results.length} clients`);
     }
 }
 
