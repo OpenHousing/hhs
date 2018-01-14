@@ -1,0 +1,47 @@
+#!/bin/bash
+
+
+export DEBUG=1
+
+
+echo
+echo "--> Setting up OpenHousing project..."
+
+echo "    * Use 'hhs-bootstrap' to install/updats all dependencies"
+hhs-bootstrap() {
+    echo "    Installing dependencies"
+    hab pkg install -b core/node
+
+    echo "    Running: script/bootstrap"
+    /src/script/bootstrap
+}
+
+echo "    * Use 'hhs-setup' to set up project to be run for the first time"
+hhs-setup() {
+    echo "    Running: script/setup"
+    /src/script/setup
+}
+
+echo "    * Use 'hhs-update' to update project to run at its current version"
+hhs-update() {
+    echo "    Running: script/update"
+    /src/script/update
+}
+
+echo "    * Use 'hhs-server' to start the app"
+hhs-server() {
+    echo "    Running: script/server"
+    /src/script/server
+}
+
+echo "    * Use 'hhs-debug' to run the app with remote debugging enabled"
+hhs-debug() {
+    hhs-update
+
+    pushd /src > /dev/null
+    node --inspect-brk=0.0.0.0:9229 index.js
+    popd > /dev/null
+}
+
+
+echo
