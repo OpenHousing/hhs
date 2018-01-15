@@ -43,5 +43,12 @@ hhs-debug() {
     popd > /dev/null
 }
 
+echo "    * Use 'hhs-generate-clients' to run the app with remote debugging enabled"
+hhs-generate-clients() {
+    pushd /src > /dev/null
+    node generate-clients.js
+    popd > /dev/null
+}
+
 
 echo
