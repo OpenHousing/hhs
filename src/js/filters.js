@@ -251,10 +251,23 @@ $(document).ready(function() {
             $('[data-toggle="tooltip"]').tooltip();
         },
         autoWidth: false,
-        paging: false,
+        serverSide: true,
+        processing: true,
         ajax: {
-            url: '/client-enrollments',
-            dataSrc: ''
+            url: '/api/clients',
+            data: function (query) {
+                return {
+                    draw: query.draw,
+                    limit: query.length,
+                    offset: query.start
+                };
+            },
+            dataSrc: function (payload) {
+                // populated totals where DataTable expects them but provides no config to change
+                payload.recordsTotal = payload.total;
+                payload.recordsFiltered = payload.total;
+                return payload.data;
+            }
         },
         buttons: [
             {
@@ -298,22 +311,22 @@ $(document).ready(function() {
         ],
         columns: [
             {
-                data: 'hmisID',
+                data: 'id',
                 name: 'hmis_id',
                 title: 'HMIS'
             },
             {
-                data: 'cjID',
+                data: 'dedup_client_id',
                 name: 'cjmis_id',
                 title: 'CJMIS'
             },
             {
-                data: 'firstName',
+                data: 'first_name',
                 name: 'firstName',
                 title: 'First Name'
             },
             {
-                data: 'lastName',
+                data: 'last_name',
                 name: 'lastName',
                 title: 'Last Name'
             },
