@@ -30,6 +30,7 @@
     "express-session": "^1.15.5",
     "jsonfile": "^4.0.0",
     "koa": "^2.3.0",
+    "koa-bodyparser": "^4.2.0",
     "koa-hbs": "^1.0.0",
     "koa-json": "^2.0.2",
     "koa-passport": "^4.0.1",

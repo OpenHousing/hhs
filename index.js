@@ -55,6 +55,10 @@ app.use(require('koa-session')(app));
 app.passport = require('./passport/okta')({ app });
 
 
+// setup body parser middleware
+app.use(require('koa-bodyparser')());
+
+
 // setup authentication enforcement
 app.unauthenticatedRoutes = [];
 
