@@ -27,3 +27,15 @@ Content-Type: application/json
     "koa:sess": "COPY_FROM_BROWSER",
     "koa:sess.sig": "COPY_FROM_BROWSER"
 }
+
+
+### Get all clients
+GET {{host}}/api/clients
+
+
+### Get page 1 of clients
+GET {{host}}/api/clients?limit=25
+
+
+### Get page 2 of clients
+GET {{host}}/api/clients?limit=25&offset=25

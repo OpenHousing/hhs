@@ -101,7 +101,8 @@ app.use(router.routes());
 // load route bundles
 [
     './routes/auth',
-    './routes/dashboard'
+    './routes/dashboard',
+    './routes/clients'
 ].forEach(routeBundle => {
     require(routeBundle)({app, router});
 });
