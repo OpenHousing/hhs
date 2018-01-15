@@ -9,7 +9,7 @@ echo "--> Setting up OpenHousing project..."
 
 echo "    * Use 'hhs-bootstrap' to install/updats all dependencies"
 hhs-bootstrap() {
-    echo "    Installing dependencies"
+    echo "    Installing habitat studio dependencies"
     hab pkg install -b core/node
 
     echo "    Running: script/bootstrap"
@@ -24,6 +24,9 @@ hhs-setup() {
 
 echo "    * Use 'hhs-update' to update project to run at its current version"
 hhs-update() {
+    echo "    Installing/updating habitat studio dependencies"
+    hab pkg install -b core/node
+
     echo "    Running: script/update"
     /src/script/update
 }
