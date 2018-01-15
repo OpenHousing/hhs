@@ -36,8 +36,6 @@ hhs-server() {
 
 echo "    * Use 'hhs-debug' to run the app with remote debugging enabled"
 hhs-debug() {
-    hhs-update
-
     pushd /src > /dev/null
     node --inspect-brk=0.0.0.0:9229 index.js
     popd > /dev/null
