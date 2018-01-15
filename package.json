@@ -40,7 +40,9 @@
     "node-minify": "^2.3.1",
     "node-storage": "0.0.7",
     "passport-okta-oauth": "0.0.1",
+    "pg": "^6.4.2",
     "request": "^2.81.0",
-    "request-promise": "^4.2.2"
+    "request-promise": "^4.2.2",
+    "sequelize": "^4.31.2"
   }
 }
