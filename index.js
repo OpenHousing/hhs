@@ -81,6 +81,18 @@ app.use(async (ctx, next) => {
 });
 
 
+// setup relaying of draw parameter for DataTable, which it needs because it can't for some reason keep track of its requests and responses
+app.use(async (ctx, next) => {
+    await next();
+
+    const drawParam = parseInt(ctx.request.query.draw, 10);
+
+    if (drawParam && ctx.status == 200 && typeof ctx.body == 'object') {
+        ctx.body.draw = drawParam;
+    }
+});
+
+
 // setup view renderer
 const hbs = require('koa-hbs');
 
