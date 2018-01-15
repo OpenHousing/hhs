@@ -50,5 +50,12 @@ hhs-generate-clients() {
     popd > /dev/null
 }
 
+echo "    * Use 'hhs-load-clients' to populate postgres table from static/client-enrollments.json"
+hhs-load-clients() {
+    pushd /src > /dev/null
+    node load-clients.js
+    popd > /dev/null
+}
+
 
 echo
