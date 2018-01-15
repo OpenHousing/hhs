@@ -1,6 +1,5 @@
 /* requires:
     moment.min.js
-    sample-data.js
     enums.js
     presets.js
 */
