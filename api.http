@@ -16,3 +16,14 @@ GET {{host}}/auth/login
 
 ### Logout
 GET {{host}}/auth/logout
+
+
+### Manual developer login
+# hijack koa:* cookie values from a browser session and use this to save cookies
+POST {{host}}/auth/manual
+Content-Type: application/json
+
+{
+    "koa:sess": "COPY_FROM_BROWSER",
+    "koa:sess.sig": "COPY_FROM_BROWSER"
+}

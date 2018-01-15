@@ -19,6 +19,7 @@ module.exports = ({
         };
     });
 
+
     // Handle login
     const loginUrl = `${path}/login`;
 
@@ -63,5 +64,22 @@ module.exports = ({
     router.get(logoutUrl, async ctx => {
         ctx.logout();
         ctx.redirect(`${process.env.OKTA_AUDIENCE}/login/signout?fromURI=${app.baseUrl}`);
+    });
+
+
+    // Handle manual auth for developers
+    const manualAuthUrl = `${path}/manual`;
+
+    app.unauthenticatedRoutes.push(manualAuthUrl);
+
+    router.post(manualAuthUrl, ctx => {
+        for (const key of Object.keys(ctx.request.body)) {
+            ctx.cookies.set(key, ctx.request.body[key]);
+        }
+
+        ctx.body = {
+            success: true,
+            cookies: ctx.request.body
+        };
     });
 };
