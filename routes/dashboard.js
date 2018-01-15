@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 module.exports = ({
     app, // Koa Server instance
     router // router instance
