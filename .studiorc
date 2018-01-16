@@ -14,6 +14,16 @@ hhs-bootstrap() {
 
     echo "    Running: script/bootstrap"
     /src/script/bootstrap
+
+    echo "    Patching shebang lines in node_modules/.bin…"
+    NODE_PREFIX="$(hab pkg path core/node)"
+
+    grep -nlI '^\#\!/usr/bin/env node' ./node_modules/.bin/* | while read -r target; do
+        echo "$target"
+        sed -e "s#\#\!/usr/bin/env node#\#\!${NODE_PREFIX}/bin/node#" --in-place --follow-symlinks "$target"
+    done
+echo
+
 }
 
 echo "    * Use 'hhs-setup' to set up project to be run for the first time"
