@@ -259,7 +259,10 @@ $(document).ready(function() {
                 return {
                     draw: query.draw,
                     limit: query.length,
-                    offset: query.start
+                    offset: query.start,
+                    order: $.isArray(query.order) ? $.map(query.order, function (field) {
+                        return query.columns[field.column].data+':'+field.dir;
+                    }).join(',') : null
                 };
             },
             dataSrc: function (payload) {
