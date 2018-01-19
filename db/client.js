@@ -7,8 +7,8 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             primaryKey: true
         },
-        dedup_client_id: {
-            type: DataTypes.STRING,
+        cj_id: {
+            type: DataTypes.INTEGER,
             unique: true
         },
         first_name: {

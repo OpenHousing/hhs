@@ -319,8 +319,8 @@ $(document).ready(function() {
                 title: 'HMIS'
             },
             {
-                data: 'dedup_client_id',
-                name: 'cjmis_id',
+                data: 'cj_id',
+                name: 'cj_id',
                 title: 'CJMIS'
             },
             {

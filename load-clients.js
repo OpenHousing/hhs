@@ -21,7 +21,7 @@ const db = require('./db');
     try {
         await db.Client.bulkCreate(clients.map(client => {
             client.id = client.hmisID;
-            client.dedup_client_id = client.dedupClientId;
+            client.cj_id = client.cjID;
             client.first_name = client.firstName;
             client.last_name = client.lastName;
             client.disabling_condition = Boolean(client.disabling_condition);
