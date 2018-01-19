@@ -77,6 +77,13 @@ $(document).ready(function() {
         dt.draw();
     };
 
+    $('#q').on('keyup', function () {
+        console.log('search', this.value)
+        var dt = clientsDataTable.DataTable();
+
+        dt.search(this.value).draw();
+    });
+
     // DataTables
 
     var booleanIcon = function(data, type, full, meta) {
@@ -260,6 +267,7 @@ $(document).ready(function() {
                     draw: query.draw,
                     limit: query.length,
                     offset: query.start,
+                    search: query.search.value,
                     order: $.isArray(query.order) ? $.map(query.order, function (field) {
                         return query.columns[field.column].data+':'+field.dir;
                     }).join(',') : null
