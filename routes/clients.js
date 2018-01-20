@@ -15,6 +15,7 @@ module.exports = ({
         const limit = parseInt(ctx.request.query.limit, 10);
         const offset = parseInt(ctx.request.query.offset, 10);
         const search = ctx.request.query.search;
+        const searchColumns = ctx.request.query.searchColumns && ctx.request.query.searchColumns.split(',').map(field => field.split(':'));
         const order = ctx.request.query.order && ctx.request.query.order.split(',').map(field => field.split(':'));
 
         if (limit) {
@@ -40,6 +41,12 @@ module.exports = ({
                     Sequelize.literal(`CAST("cj_id" AS TEXT) like '%${search}%'`)
                 ];
             }
+        }
+
+        if (searchColumns) {
+            searchColumns.forEach(field => {
+                queryOptions.where[field[0]] = field[1];
+            });
         }
 
         if (order) {

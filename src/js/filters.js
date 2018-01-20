@@ -263,11 +263,18 @@ $(document).ready(function() {
         ajax: {
             url: '/api/clients',
             data: function (query) {
+                var searchColumns = $.map($.grep(query.columns, function(field) {
+                    return field.searchable && field.search.value !== '';  
+                }), function(field) {
+                    return field.data + ':' + field.search.value
+                }).join(',');
+
                 return {
                     draw: query.draw,
                     limit: query.length,
                     offset: query.start,
                     search: query.search.value,
+                    searchColumns: searchColumns,
                     order: $.isArray(query.order) ? $.map(query.order, function (field) {
                         return query.columns[field.column].data+':'+field.dir;
                     }).join(',') : null
@@ -324,22 +331,26 @@ $(document).ready(function() {
             {
                 data: 'id',
                 name: 'hmis_id',
-                title: 'HMIS'
+                title: 'HMIS',
+                searchable: false
             },
             {
                 data: 'cj_id',
                 name: 'cj_id',
-                title: 'CJMIS'
+                title: 'CJMIS',
+                searchable: false
             },
             {
                 data: 'first_name',
                 name: 'firstName',
-                title: 'First Name'
+                title: 'First Name',
+                searchable: false
             },
             {
                 data: 'last_name',
                 name: 'lastName',
-                title: 'Last Name'
+                title: 'Last Name',
+                searchable: false
             },
             {
                 data: 'dob',
