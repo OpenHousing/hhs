@@ -248,10 +248,6 @@ $(document).ready(function() {
                 defaultContent: '&mdash;',
                 name: 'foo'
             },
-            // {
-            //     targets: [0, 1],
-            //     render: guidRenderer
-            // },
             {
                 targets: [6, 8],
                 type: 'integer',
