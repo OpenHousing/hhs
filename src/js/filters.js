@@ -158,36 +158,6 @@ $(document).ready(function() {
         clientsDataTable.DataTable().draw();
     });
 
-    // youth search filter
-    $.fn.dataTable.ext.search.push(
-        function(settings, data, dataIndex) {
-            var min = 18,
-                max = 24,
-                age = moment().diff(data[4], 'years'),
-                checkedVal = $('[name="youth_status"]:checked').val(),
-                isInRange = false;
-
-            if (checkedVal) {
-                if (( isNaN( min ) && isNaN( max ) ) ||
-                    ( isNaN( min ) && age <= max )   ||
-                    ( min <= age   && isNaN( max ) ) ||
-                    ( min <= age   && age <= max ) ) {
-
-                    isInRange = true;
-                }
-
-                if (checkedVal == "true") {
-                    return isInRange;
-                } else if (checkedVal == "false") {
-                    return !isInRange;
-                }
-            }
-
-            // no filter because no button checked
-            return true;
-        }
-    )
-
     // asc and desc sort functions to make sure non-integers are always ordered last
 
     $.fn.dataTable.ext.type.order['integer-asc'] = function(a, b) {
@@ -232,6 +202,7 @@ $(document).ready(function() {
             data: function (query) {
                 var releaseDateStart = $('[name=release_date_start]').val();
                 var releaseDateEnd = $('[name=release_date_end]').val();
+                var youthOnly = $('[name="youth_status"]:checked').val();
                 var searchColumns = $.map($.grep(query.columns, function(field) {
                     return field.searchable && field.search.value !== '';  
                 }), function(field) {
@@ -246,6 +217,7 @@ $(document).ready(function() {
                     searchColumns: searchColumns,
                     releaseDateStart: releaseDateStart,
                     releaseDateEnd: releaseDateEnd,
+                    youthOnly: youthOnly,
                     order: $.isArray(query.order) ? $.map(query.order, function (field) {
                         return query.columns[field.column].data+':'+field.dir;
                     }).join(',') : null

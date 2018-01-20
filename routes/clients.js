@@ -19,6 +19,7 @@ module.exports = ({
         const searchColumns = ctx.request.query.searchColumns && ctx.request.query.searchColumns.split(',').map(field => field.split(':'));
         const releaseDateStart = ctx.query.releaseDateStart;
         const releaseDateEnd = ctx.query.releaseDateEnd;
+        const youthOnly = (ctx.query.youthOnly == 'true');
         const order = ctx.request.query.order && ctx.request.query.order.split(',').map(field => field.split(':'));
 
         if (limit) {
@@ -65,7 +66,11 @@ module.exports = ({
             if (!queryOptions.where['jail_release_date']) {
                 queryOptions.where['jail_release_date'] = {};
             }
-            queryOptions.where['jail_release_date'][Op.lt] = releaseDateEnd ;
+            queryOptions.where['jail_release_date'][Op.lte] = releaseDateEnd ;
+        }
+
+        if (youthOnly) {
+            queryOptions.where['dob'] = { [Op.gte]: moment().subtract(24, "years") };
         }
 
         if (order) {
