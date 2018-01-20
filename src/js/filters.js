@@ -1,6 +1,5 @@
 /* requires:
     moment.min.js
-    sample-data.js
     enums.js
     presets.js
 */
@@ -78,6 +77,13 @@ $(document).ready(function() {
         dt.draw();
     };
 
+    $('#q').on('keyup', function () {
+        console.log('search', this.value)
+        var dt = clientsDataTable.DataTable();
+
+        dt.search(this.value).draw();
+    });
+
     // DataTables
 
     var booleanIcon = function(data, type, full, meta) {
@@ -152,36 +158,6 @@ $(document).ready(function() {
         clientsDataTable.DataTable().draw();
     });
 
-    // youth search filter
-    $.fn.dataTable.ext.search.push(
-        function(settings, data, dataIndex) {
-            var min = 18,
-                max = 24,
-                age = moment().diff(data[4], 'years'),
-                checkedVal = $('[name="youth_status"]:checked').val(),
-                isInRange = false;
-
-            if (checkedVal) {
-                if (( isNaN( min ) && isNaN( max ) ) ||
-                    ( isNaN( min ) && age <= max )   ||
-                    ( min <= age   && isNaN( max ) ) ||
-                    ( min <= age   && age <= max ) ) {
-
-                    isInRange = true;
-                }
-
-                if (checkedVal == "true") {
-                    return isInRange;
-                } else if (checkedVal == "false") {
-                    return !isInRange;
-                }
-            }
-
-            // no filter because no button checked
-            return true;
-        }
-    )
-
     // asc and desc sort functions to make sure non-integers are always ordered last
 
     $.fn.dataTable.ext.type.order['integer-asc'] = function(a, b) {
@@ -214,48 +190,46 @@ $(document).ready(function() {
         }
     }
 
-    var dateColumnIndex = 9;
-    // date range filtering
-    $.fn.dataTableExt.afnFiltering.push(
-        function( oSettings, aData, iDataIndex ) {
-            var start = $('[name=release_date_start]').val(),
-                end = $('[name=release_date_end]').val(),
-                rowDate = aData[dateColumnIndex] && new Date(aData[dateColumnIndex]) || null;
-
-            start = start.substring(6,10) + start.substring(0,2) + start.substring(3,5);
-            end = end.substring(6,10) + end.substring(0,2) + end.substring(3,5);
-
-            if (rowDate) {
-                date = `${rowDate.getFullYear()}`;
-                date += rowDate.getMonth() + 1 <= 9 ? `0${rowDate.getMonth()+1}` : `${rowDate.getMonth()+1}`;
-                date += rowDate.getDate() <= 0 ? `0${rowDate.getDate()}` : `${rowDate.getDate()}`;
-            }
-
-            if (start === "" && end === "" ) {
-                return true;
-            } else if (date === null) {
-                return false;
-            } else if (start <= date && end === "") {
-                return true;
-            } else if (end >= date && start === "") {
-                return true;
-            } else if (start <= date && end >= date) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    );
-
     clientsDataTable.DataTable({
         "fnDrawCallback": function() {
             $('[data-toggle="tooltip"]').tooltip();
         },
         autoWidth: false,
-        paging: false,
+        serverSide: true,
+        processing: true,
+        iDisplayLength: 100,
         ajax: {
-            url: '/client-enrollments',
-            dataSrc: ''
+            url: '/api/clients',
+            data: function (query) {
+                var releaseDateStart = $('[name=release_date_start]').val();
+                var releaseDateEnd = $('[name=release_date_end]').val();
+                var youthOnly = $('[name="youth_status"]:checked').val();
+                var searchColumns = $.map($.grep(query.columns, function(field) {
+                    return field.searchable && field.search.value !== '';  
+                }), function(field) {
+                    return field.data + ':' + field.search.value
+                }).join(',');
+
+                return {
+                    draw: query.draw,
+                    limit: query.length,
+                    offset: query.start,
+                    search: query.search.value,
+                    searchColumns: searchColumns,
+                    releaseDateStart: releaseDateStart,
+                    releaseDateEnd: releaseDateEnd,
+                    youthOnly: youthOnly,
+                    order: $.isArray(query.order) ? $.map(query.order, function (field) {
+                        return query.columns[field.column].data+':'+field.dir;
+                    }).join(',') : null
+                };
+            },
+            dataSrc: function (payload) {
+                // populated totals where DataTable expects them but provides no config to change
+                payload.recordsTotal = payload.total;
+                payload.recordsFiltered = payload.total;
+                return payload.data;
+            }
         },
         buttons: [
             {
@@ -274,10 +248,6 @@ $(document).ready(function() {
                 defaultContent: '&mdash;',
                 name: 'foo'
             },
-            // {
-            //     targets: [0, 1],
-            //     render: guidRenderer
-            // },
             {
                 targets: [6, 8],
                 type: 'integer',
@@ -299,24 +269,28 @@ $(document).ready(function() {
         ],
         columns: [
             {
-                data: 'hmisID',
+                data: 'id',
                 name: 'hmis_id',
-                title: 'HMIS'
+                title: 'HMIS',
+                searchable: false
             },
             {
-                data: 'cjID',
-                name: 'cjmis_id',
-                title: 'CJMIS'
+                data: 'cj_id',
+                name: 'cj_id',
+                title: 'CJMIS',
+                searchable: false
             },
             {
-                data: 'firstName',
+                data: 'first_name',
                 name: 'firstName',
-                title: 'First Name'
+                title: 'First Name',
+                searchable: false
             },
             {
-                data: 'lastName',
+                data: 'last_name',
                 name: 'lastName',
-                title: 'Last Name'
+                title: 'Last Name',
+                searchable: false
             },
             {
                 data: 'dob',
@@ -362,7 +336,8 @@ $(document).ready(function() {
                 orderable: true,
                 render: {
                     display: dateRenderer
-                }
+                },
+                searchable: false
             },
             {
                 data: 'history_unsheltered',

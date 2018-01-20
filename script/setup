@@ -7,6 +7,14 @@ cd "$(dirname "$0")/.."
 # ensure dependencies are all available
 script/bootstrap
 
+# ensure app needs bootstrapping
+if [ -f .env ]; then
+    echo
+    echo ".env already exists, and setup will overwrite it"
+    echo "Delete .env before re-running setup to confirm"
+    exit 1
+fi
+
 echo "==> Initializing .env…"
 cp -v sample.env .env
 

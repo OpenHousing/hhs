@@ -1,0 +1,72 @@
+#!/bin/bash
+
+
+export DEBUG=1
+
+
+echo
+echo "--> Setting up OpenHousing project..."
+
+echo "    * Use 'hhs-bootstrap' to install/updats all dependencies"
+hhs-bootstrap() {
+    echo "    Installing habitat studio dependencies"
+    hab pkg install -b core/node
+
+    echo "    Running: script/bootstrap"
+    /src/script/bootstrap
+
+    echo "    Patching shebang lines in node_modules/.bin…"
+    NODE_PREFIX="$(hab pkg path core/node)"
+
+    grep -nlI '^\#\!/usr/bin/env node' ./node_modules/.bin/* | while read -r target; do
+        echo "$target"
+        sed -e "s#\#\!/usr/bin/env node#\#\!${NODE_PREFIX}/bin/node#" --in-place --follow-symlinks "$target"
+    done
+echo
+
+}
+
+echo "    * Use 'hhs-setup' to set up project to be run for the first time"
+hhs-setup() {
+    echo "    Running: script/setup"
+    /src/script/setup
+}
+
+echo "    * Use 'hhs-update' to update project to run at its current version"
+hhs-update() {
+    echo "    Installing/updating habitat studio dependencies"
+    hab pkg install -b core/node
+
+    echo "    Running: script/update"
+    /src/script/update
+}
+
+echo "    * Use 'hhs-server' to start the app"
+hhs-server() {
+    echo "    Running: script/server"
+    /src/script/server
+}
+
+echo "    * Use 'hhs-debug' to run the app with remote debugging enabled"
+hhs-debug() {
+    pushd /src > /dev/null
+    node --inspect-brk=0.0.0.0:9229 index.js
+    popd > /dev/null
+}
+
+echo "    * Use 'hhs-generate-clients' to run the app with remote debugging enabled"
+hhs-generate-clients() {
+    pushd /src > /dev/null
+    node generate-clients.js
+    popd > /dev/null
+}
+
+echo "    * Use 'hhs-load-clients' to populate postgres table from static/client-enrollments.json"
+hhs-load-clients() {
+    pushd /src > /dev/null
+    node load-clients.js
+    popd > /dev/null
+}
+
+
+echo
