@@ -9,7 +9,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         cj_id: {
             type: DataTypes.INTEGER,
-            unique: true
+            // Removed this contraint to allow production data to be imported - KBC
+            unique: false
         },
         first_name: {
             type: DataTypes.STRING,
