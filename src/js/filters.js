@@ -220,39 +220,6 @@ $(document).ready(function() {
         }
     }
 
-    var dateColumnIndex = 9;
-    // date range filtering
-    $.fn.dataTableExt.afnFiltering.push(
-        function( oSettings, aData, iDataIndex ) {
-            var start = $('[name=release_date_start]').val(),
-                end = $('[name=release_date_end]').val(),
-                rowDate = aData[dateColumnIndex] && new Date(aData[dateColumnIndex]) || null;
-
-            start = start.substring(6,10) + start.substring(0,2) + start.substring(3,5);
-            end = end.substring(6,10) + end.substring(0,2) + end.substring(3,5);
-
-            if (rowDate) {
-                date = `${rowDate.getFullYear()}`;
-                date += rowDate.getMonth() + 1 <= 9 ? `0${rowDate.getMonth()+1}` : `${rowDate.getMonth()+1}`;
-                date += rowDate.getDate() <= 0 ? `0${rowDate.getDate()}` : `${rowDate.getDate()}`;
-            }
-
-            if (start === "" && end === "" ) {
-                return true;
-            } else if (date === null) {
-                return false;
-            } else if (start <= date && end === "") {
-                return true;
-            } else if (end >= date && start === "") {
-                return true;
-            } else if (start <= date && end >= date) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    );
-
     clientsDataTable.DataTable({
         "fnDrawCallback": function() {
             $('[data-toggle="tooltip"]').tooltip();
@@ -263,6 +230,8 @@ $(document).ready(function() {
         ajax: {
             url: '/api/clients',
             data: function (query) {
+                var releaseDateStart = $('[name=release_date_start]').val();
+                var releaseDateEnd = $('[name=release_date_end]').val();
                 var searchColumns = $.map($.grep(query.columns, function(field) {
                     return field.searchable && field.search.value !== '';  
                 }), function(field) {
@@ -275,6 +244,8 @@ $(document).ready(function() {
                     offset: query.start,
                     search: query.search.value,
                     searchColumns: searchColumns,
+                    releaseDateStart: releaseDateStart,
+                    releaseDateEnd: releaseDateEnd,
                     order: $.isArray(query.order) ? $.map(query.order, function (field) {
                         return query.columns[field.column].data+':'+field.dir;
                     }).join(',') : null
@@ -396,7 +367,8 @@ $(document).ready(function() {
                 orderable: true,
                 render: {
                     display: dateRenderer
-                }
+                },
+                searchable: false
             },
             {
                 data: 'history_unsheltered',

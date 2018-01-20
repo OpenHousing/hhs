@@ -37,6 +37,7 @@
     "koa-router": "^7.2.1",
     "koa-session": "^5.5.0",
     "koa-static": "^4.0.1",
+    "moment": "^2.20.1",
     "node-cache": "^4.1.1",
     "node-minify": "^2.3.1",
     "node-storage": "0.0.7",

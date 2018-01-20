@@ -1,4 +1,5 @@
 const { Client } = require('../db');
+const moment = require('moment');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -16,6 +17,8 @@ module.exports = ({
         const offset = parseInt(ctx.request.query.offset, 10);
         const search = ctx.request.query.search;
         const searchColumns = ctx.request.query.searchColumns && ctx.request.query.searchColumns.split(',').map(field => field.split(':'));
+        const releaseDateStart = ctx.query.releaseDateStart;
+        const releaseDateEnd = ctx.query.releaseDateEnd;
         const order = ctx.request.query.order && ctx.request.query.order.split(',').map(field => field.split(':'));
 
         if (limit) {
@@ -47,6 +50,22 @@ module.exports = ({
             searchColumns.forEach(field => {
                 queryOptions.where[field[0]] = field[1];
             });
+        }
+
+        var validReleaseStartDate = moment(releaseDateStart, "MM/DD/YYYY", true).isValid();
+        var validReleaseEndDate = moment(releaseDateEnd, "MM/DD/YYYY", true).isValid();
+
+        if (validReleaseStartDate) {
+            queryOptions.where['jail_release_date'] = {
+                [Op.gt]: releaseDateStart
+            };
+        }
+
+        if (validReleaseEndDate) {
+            if (!queryOptions.where['jail_release_date']) {
+                queryOptions.where['jail_release_date'] = {};
+            }
+            queryOptions.where['jail_release_date'][Op.lt] = releaseDateEnd ;
         }
 
         if (order) {
