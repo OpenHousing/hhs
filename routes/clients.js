@@ -58,7 +58,7 @@ module.exports = ({
 
         if (validReleaseStartDate) {
             queryOptions.where['jail_release_date'] = {
-                [Op.gt]: releaseDateStart
+                [Op.gte]: releaseDateStart
             };
         }
 
