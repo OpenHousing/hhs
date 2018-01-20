@@ -11,6 +11,7 @@ const db = require('./db');
 
 // read clients
 (async () => {
+    let insertedClients = [];
     // load clients
     const clients = JSON.parse(require('fs').readFileSync('./static/client-enrollments.json'));
 
@@ -29,11 +30,11 @@ const db = require('./db');
             client.user_type_cj = client.bookingCount;
             client.currently_incarcerated = Boolean(client.currentlyInJail);
 
-            return client;
+        return client;
         }));
     } catch (err) {
         console.error('failed to bulk create clients:', err);
     }
-
+    console.log(`Done. Inserted ${insertedClients.length}.`);
     process.exit(0);
 })();
