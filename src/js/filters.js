@@ -197,6 +197,7 @@ $(document).ready(function() {
         autoWidth: false,
         serverSide: true,
         processing: true,
+        iDisplayLength: 100,
         ajax: {
             url: '/api/clients',
             data: function (query) {
