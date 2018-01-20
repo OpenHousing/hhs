@@ -25,6 +25,9 @@ const db = require('./db');
             client.first_name = client.firstName;
             client.last_name = client.lastName;
             client.disabling_condition = Boolean(client.disabling_condition);
+            client.user_type_hmis = client.homelessHousingStatusCount;
+            client.user_type_cj = client.bookingCount;
+            client.currently_incarcerated = Boolean(client.currentlyInJail);
 
             return client;
         }));
