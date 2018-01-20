@@ -19,8 +19,8 @@ const db = require('./db');
 
     // write clients
     try {
-        await db.Client.bulkCreate(clients.map(client => {
-            client.id = client.hmisID;
+        insertedClients = await db.Client.bulkCreate(clients.map(client => {
+            client.id = client.sourceSystemId;
             client.cj_id = client.cjID;
             client.first_name = client.firstName;
             client.last_name = client.lastName;
