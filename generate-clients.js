@@ -140,7 +140,7 @@ const getClients = async() => {
                     }).length;
 
                     familyStatusCount = enrollments.filter((e) => {
-                        return e.householdid.length > 0
+                        return hudMappings.housingStatusIds.includes(e.housingstatus)
                     }).length;
 
                     client.disabling_condition = disablingConditionCount > 0;
