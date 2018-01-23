@@ -51,7 +51,8 @@ const cocID = process.env.COC_ID;
 
 const hudMappings = {
     disablingConditionIds: [1],
-    homelessLivingSituationIds: [16, 1, 18, 27]
+    homelessLivingSituationIds: [16, 1, 18, 27],
+    housingStatusIds: [1] // homeless
 };
 
 const getClients = async() => {
@@ -107,8 +108,8 @@ const getClients = async() => {
             console.log(`Processing Client: ${i}/${clients.length}`);
             var client = clients[i];
 
+            client.originalSourceId = client.sourceSystemId;
             client.hmisID = client.sourceSystemId.substring(7);
-            client.cjID = Math.floor((Math.random() * 999) + 1000);
 
             try {
                 // TODO load project type
@@ -139,13 +140,16 @@ const getClients = async() => {
                     }).length;
 
                     familyStatusCount = enrollments.filter((e) => {
-                        return e.householdid.length > 0
+                        return hudMappings.housingStatusIds.includes(e.housingstatus)
                     }).length;
 
                     client.disabling_condition = disablingConditionCount > 0;
                     client.homelessHousingStatusCount = homelessHousingStatusCount;
                     client.family_status = familyStatusCount > 0;
                     client.history_unsheltered = homelessHousingStatusCount > 0;
+                    client.currently_homeless_shelter = enrollments.filter((e) => {
+                        return hudMappings.homelessLivingSituationIds.includes(e.housingstatus);
+                    }).length > 0;
 
                     // Disable CocID check for now since all hmislynk data has this id.
                     client.cocMatch = true;
@@ -195,7 +199,7 @@ const getClients = async() => {
                     continue;
                 }
 
-                const crosswalkRecord = crosswalkData.find((x) => x.confidence > cjAPIConfig.minConfidence && x.source_system_id === client.sourceSystemId);
+                const crosswalkRecord = crosswalkData.find((x) => x.confidence > cjAPIConfig.minConfidence && x.source_system_id === client.originalSourceId);
 
                 client.currentlyInJail = false;
                 client.bookingCount = 0;

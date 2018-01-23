@@ -13,8 +13,8 @@ module.exports = ({
     router.get(`/api${path}`, async function (ctx) {
         const queryOptions = {where:{}};
 
-        const limit = parseInt(ctx.request.query.limit, 100);
-        const offset = parseInt(ctx.request.query.offset, 100);
+        const limit = parseInt(ctx.request.query.limit, 10);
+        const offset = parseInt(ctx.request.query.offset, 10);
         const search = ctx.request.query.search;
         const searchColumns = ctx.request.query.searchColumns && ctx.request.query.searchColumns.split(',').map(field => field.split(':'));
         const releaseDateStart = ctx.query.releaseDateStart;
@@ -70,7 +70,10 @@ module.exports = ({
         }
 
         if (youthOnly) {
-            queryOptions.where['dob'] = { [Op.gte]: moment().subtract(24, "years") };
+            queryOptions.where[Op.and] = [
+                Sequelize.literal(`"dob" <= '${moment().subtract(18, "years").format("YYYY-MM-DD")}'`),
+                Sequelize.literal(`"dob" >= '${moment().subtract(24, "years").format("YYYY-MM-DD")}'`)
+            ];
         }
 
         if (order) {
