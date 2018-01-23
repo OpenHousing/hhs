@@ -109,7 +109,6 @@ const getClients = async() => {
 
             client.originalSourceId = client.sourceSystemId;
             client.hmisID = client.sourceSystemId.substring(7);
-            client.cjID = Math.floor((Math.random() * 999) + 1000);
 
             try {
                 // TODO load project type
