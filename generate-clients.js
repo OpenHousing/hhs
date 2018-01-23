@@ -51,7 +51,8 @@ const cocID = process.env.COC_ID;
 
 const hudMappings = {
     disablingConditionIds: [1],
-    homelessLivingSituationIds: [16, 1, 18, 27]
+    homelessLivingSituationIds: [16, 1, 18, 27],
+    housingStatusIds: [1] // homeless
 };
 
 const getClients = async() => {
@@ -146,6 +147,9 @@ const getClients = async() => {
                     client.homelessHousingStatusCount = homelessHousingStatusCount;
                     client.family_status = familyStatusCount > 0;
                     client.history_unsheltered = homelessHousingStatusCount > 0;
+                    client.currently_homeless_shelter = enrollments.filter((e) => {
+                        return hudMappings.homelessLivingSituationIds.includes(e.housingstatus);
+                    }).length > 0;
 
                     // Disable CocID check for now since all hmislynk data has this id.
                     client.cocMatch = true;
