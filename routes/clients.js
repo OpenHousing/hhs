@@ -70,7 +70,10 @@ module.exports = ({
         }
 
         if (youthOnly) {
-            queryOptions.where['dob'] = { [Op.gte]: moment().subtract(24, "years") };
+            queryOptions.where[Op.and] = [
+                Sequelize.literal(`"dob" <= '${moment().subtract(18, "years").format("YYYY-MM-DD")}'`),
+                Sequelize.literal(`"dob" >= '${moment().subtract(24, "years").format("YYYY-MM-DD")}'`)
+            ];
         }
 
         if (order) {
