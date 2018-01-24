@@ -108,7 +108,6 @@ const getClients = async() => {
             console.log(`Processing Client: ${i}/${clients.length}`);
             var client = clients[i];
 
-            client.originalSourceId = client.sourceSystemId;
             client.hmisID = client.sourceSystemId.substring(7);
 
             try {
@@ -199,7 +198,7 @@ const getClients = async() => {
                     continue;
                 }
 
-                const crosswalkRecord = crosswalkData.find((x) => x.confidence > cjAPIConfig.minConfidence && x.source_system_id === client.originalSourceId);
+                const crosswalkRecord = crosswalkData.find((x) => x.confidence > cjAPIConfig.minConfidence && x.source_system_id === `client_${client.hmisID}`);
 
                 client.currentlyInJail = false;
                 client.bookingCount = 0;
