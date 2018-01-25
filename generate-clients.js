@@ -198,7 +198,7 @@ const getClients = async() => {
                     continue;
                 }
 
-                const crosswalkRecord = crosswalkData.find((x) => x.confidence > cjAPIConfig.minConfidence && x.source_system_id === `client_${client.hmisID}`);
+                const crosswalkRecord = crosswalkData.find((x) => x.confidence > cjAPIConfig.minConfidence && x.source_system_id === `client_${client.sourceSystemId}`);
 
                 client.currentlyInJail = false;
                 client.bookingCount = 0;
