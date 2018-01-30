@@ -111,6 +111,19 @@ const getClients = async() => {
             client.hmisID = client.sourceSystemId.substring(7);
 
             try {
+                const veteranInfoUrl = `${hmislynkApiUrl}/clients/${client.clientId}/veteraninfos`;
+                const veteranInfoRequestOptions = {
+                    url: veteranInfoUrl,
+                    qs: {
+                        maxItems: 100000
+                    },
+                    headers: authHeaders,
+                    json: true
+                };
+
+                const veteransResponse = await request(veteranInfoRequestOptions);
+                client.veteran_status = veteransResponse && veteransResponse.veteranInfos.length > 0;
+                
                 // TODO load project type
                 const enrollmentUrl = `${hmislynkApiUrl}/clients/${client.clientId}/enrollments`
                 const enrollmentRequestOptions = {
@@ -236,30 +249,9 @@ const getClients = async() => {
                         }
                     }, {retries: 10});
                 }
-                
-            }
-            catch(err) {
-                console.log('Error:', err);
-                debugger
-            }
-
-            try {
-                const veteranInfoUrl = `${hmislynkApiUrl}/clients/${client.clientId}/veteraninfos`;
-                const veteranInfoRequestOptions = {
-                    url: veteranInfoUrl,
-                    qs: {
-                        maxItems: 100000
-                    },
-                    headers: authHeaders,
-                    json: true
-                };
-
-                const veteransResponse = await request(veteranInfoRequestOptions);
-                client.veteran_status = veteransResponse && veteransResponse.veteranInfos.length > 0;
             }
             catch (err) {
                 console.log('Error:', err);
-                debugger
             }
 
             if(client.cocMatch) {
