@@ -29,7 +29,14 @@ const db = require('./db');
             client.user_type_hmis = client.homelessHousingStatusCount;
             client.user_type_cj = client.bookingCount;
             client.currently_incarcerated = Boolean(client.currentlyInJail);
-
+            client.currently_homeless_shelter = Boolean(client.currently_homeless_shelter);
+            client.veteran_status = Boolean(client.veteran_status);
+            client.chronic_status = Boolean(client.chronic_status);
+            client.disabled_status = Boolean(client.disabled_status);
+            client.family_status = Boolean(client.family_status);
+            client.history_unsheltered = Boolean(client.history_unsheltered);
+            client.jail_release_date = new Date(client.jail_release_date);
+            client.dob = new Date(client.dob);
         return client;
         }));
     } catch (err) {

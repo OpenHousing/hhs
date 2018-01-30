@@ -155,12 +155,16 @@ const getClients = async() => {
                         return hudMappings.housingStatusIds.includes(e.housingstatus)
                     }).length;
 
-                    client.disabling_condition = disablingConditionCount > 0;
+                    client.disabled_status = disablingConditionCount > 0;
                     client.homelessHousingStatusCount = homelessHousingStatusCount;
                     client.family_status = familyStatusCount > 0;
                     client.history_unsheltered = homelessHousingStatusCount > 0;
                     client.currently_homeless_shelter = enrollments.filter((e) => {
                         return hudMappings.homelessLivingSituationIds.includes(e.housingstatus);
+                    }).length > 0;
+
+                    client.chronic_status = enrollments.filter((e) => {
+                        return e.chronic_status
                     }).length > 0;
 
                     // Disable CocID check for now since all hmislynk data has this id.
@@ -213,7 +217,7 @@ const getClients = async() => {
 
                 const crosswalkRecord = crosswalkData.find((x) => x.confidence > cjAPIConfig.minConfidence && x.source_system_id === `client_${client.sourceSystemId}`);
 
-                client.currentlyInJail = false;
+                client.currently_incarcerated = false;
                 client.bookingCount = 0;
 
                 if(crosswalkRecord) {
@@ -236,10 +240,9 @@ const getClients = async() => {
                     await retry(async bail => {
                         // if anything throws, we retry
                         const cjResponse = await request(cjJailStayRequestOptions);
-    
-                        console.log('cjResponse length: ', cjResponse.length);
-    
-                        client.currentlyInJail = cjResponse.find(x => (new Date(cjResponse[0].date_of_release)) > (new Date())) !== undefined;
+
+                        client.currently_incarcerated = cjResponse.find(x => (new Date(cjResponse[0].date_of_release)) > (new Date())) !== undefined;
+                        client.jail_release_date = Math.max.apply(cjResponse.map( x => x.date_of_release));
                         client.bookingCount = cjResponse.length;
                         if (cjResponse.length > 0) {
                             client.jailReleaseDate = cjResponse
