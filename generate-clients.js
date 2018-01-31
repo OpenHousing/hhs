@@ -122,7 +122,7 @@ const getClients = async() => {
                 };
 
                 const veteransResponse = await request(veteranInfoRequestOptions);
-                client.veteran_status = veteransResponse && veteransResponse.veteranInfos.length > 0;
+                client.veteran_status = veteransResponse && veteransResponse.veteranInfos && veteransResponse.veteranInfos.veteranInfos.length > 0;
                 
                 // TODO load project type
                 const enrollmentUrl = `${hmislynkApiUrl}/clients/${client.clientId}/enrollments`
