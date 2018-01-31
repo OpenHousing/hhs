@@ -35,8 +35,14 @@ const db = require('./db');
             client.disabled_status = Boolean(client.disabled_status);
             client.family_status = Boolean(client.family_status);
             client.history_unsheltered = Boolean(client.history_unsheltered);
-            client.jail_release_date = new Date(client.jail_release_date);
-            client.dob = new Date(client.dob);
+            if (client.jail_release_date) {
+                client.jail_release_date = new Date(client.jail_release_date).getTime();
+            }
+            else {
+                delete client.jail_release_date;
+            }
+            client.dob = client.dob;
+
         return client;
         }));
     } catch (err) {
