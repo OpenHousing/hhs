@@ -1,39 +1,39 @@
 'use strict';
 
-
 // load config from .env into process.env
 require('dotenv').config();
-const csv = require('csvtojson')();
-
+const fs = require('fs');
+const parse = require('csv-parse/lib/sync');
 
 // connect to database
 const db = require('./db');
 
-
-// read vispdat
 (async () => {
     let insertedVispdat = [];
-    // load vispdat
-    // TODO: parse CSV
-    let vispdat = [];
-    csv
-        .fromFile('./static/VISPDAT.csv')
-        .on('json', (json) => {
-            vispdat.push(json);
-        });
 
-    // create table
-    await db.vispdat.sync({force: true});
+    const crosswalkCSV = fs.readFileSync(__dirname+'/VISPDAT.csv').toString();
+    const vispdat = parse(crosswalkCSV, {columns: true});
 
-    // write clients
-    try {
-        insertedVispdat = await db.vispdat.bulkCreate(vispdat.map(vi_spdat_record => ({
-            vi_spdat: vi_spdat_record['VISPDAT'],
-            project_entry_id: vi_spdat_record['ProjectEntryID']
-        })));
-    } catch (err) {
-        console.error('failed to bulk create VISPDAT:', err);
+    for(let i = 0; i < vispdat.length; i++) {
+        const v = vispdat[i];
+        try {
+            const client = await db.Client.findById(v['client-id']);
+            
+
+            if(client) {
+                const accessedDate = new Date(v['vispdat-date']);
+                if(!client.vi_spdat_assessed_date || client.vi_spdat_assessed_date < accessedDate) {
+                    client.vi_spdat = parseInt(v['vispdat-score']);
+                    client.vi_spdat_assessed_date = accessedDate;
+
+                    await client.save();
+                }
+            }
+        } catch (err) {
+            console.error('failed to update client with vispdat record:', v);
+        }
+        console.log('Done!');
     }
-    console.log(`Done. Inserted ${insertedVispdat.length}.`);
+    
     process.exit(0);
 })();
