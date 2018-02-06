@@ -1,17 +1,18 @@
 'use strict';
 
-
 module.exports = (sequelize, DataTypes) => {
-    const VISPDAT = sequelize.define('vispdat', {
-        vi_spdat: {
+    const VISPDAT = sequelize.define('Vispdat', {
+        client_id: {
             type: DataTypes.INTEGER
         },
-        project_entry_id: {
-            type: DataTypes.INTEGER
+        date: {
+            type: DataTypes.STRING
         },
-
+        score: {
+            type: DataTypes.INTEGER
+        }
     }, {
-        timestamps: false,
+        timestamps: true,
         paranoid: false,
         underscored: true
     });
