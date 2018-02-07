@@ -164,7 +164,7 @@ const getClients = async() => {
                     }).length > 0;
 
                     client.chronic_status = enrollments.filter((e) => {
-                        return e.chronic_status
+                        return e.chronicHomeless;
                     }).length > 0;
 
                     // Disable CocID check for now since all hmislynk data has this id.
